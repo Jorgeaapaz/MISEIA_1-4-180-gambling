@@ -28,7 +28,7 @@ async function getDb(): Promise<Db> {
   // Create indexes
   await db.collection('bets').createIndex({ matchId: 1 })
   await db.collection('bets').createIndex({ userId: 1 })
-  await db.collection('bets').createIndex({ redsysOrderId: 1 }, { unique: true, sparse: true })
+  await db.collection('bets').createIndex({ redsysOrderId: 1 }, { unique: true })
   await db.collection('magic_tokens').createIndex({ token: 1 }, { unique: true })
   await db.collection('magic_tokens').createIndex(
     { expiresAt: 1 },

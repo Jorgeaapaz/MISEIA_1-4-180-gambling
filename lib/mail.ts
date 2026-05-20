@@ -8,7 +8,7 @@ const transporter = nodemailer.createTransport({
 })
 
 export async function sendMagicLink(email: string, token: string) {
-  const link = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify?token=${token}`
+  const link = `${process.env.NEXT_PUBLIC_API_URL}/auth/verify?token=${token}`
   await transporter.sendMail({
     from: process.env.MAIL_FROM || 'noreply@gambling.local',
     to: email,
