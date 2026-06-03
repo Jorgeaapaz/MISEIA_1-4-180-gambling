@@ -283,3 +283,60 @@ La app corre localmente sin necesidad de NAT/VirtualBox. Servicios:
 - Probar IPN de REDSYS con ngrok o simulación manual
 - Añeadir API endpoint para que el usuario vea su saldo (`/api/me`)
 - Considerar página de perfil con balance visible en la Navbar
+
+---
+
+# Retrospectiva de Sesión — 2026-06-02
+### Tarjetas de prueba REDSYS (referencia rápida)
+
+## Tarjetas de prueba REDSYS / REDSYS Test Cards
+
+Entorno sandbox: `https://sis-t.redsys.es:25443/sis/realizarPago`
+
+> Usar estas tarjetas en el formulario TPV virtual que genera la app tras confirmar una apuesta.
+
+### Tarjetas que aprueban el pago
+
+| Tipo | Número de tarjeta | Caducidad | CVV | Resultado |
+|------|-------------------|-----------|-----|-----------|
+| Visa | `4548 8120 4940 0004` | 12/26 | `123` | Autorizado ✅ |
+| Mastercard | `5137 0042 1901 9741` | 12/26 | `737` | Autorizado ✅ |
+| American Express | `3769 6950 0000 009` | 12/26 | `7373` | Autorizado ✅ |
+
+### Tarjetas con autenticación 3DS (Verified by Visa / SecureCode)
+
+| Tipo | Número de tarjeta | Caducidad | CVV | OTP sandbox | Resultado |
+|------|-------------------|-----------|-----|-------------|-----------|
+| Visa 3DS | `4918 0190 0000 0002` | 12/26 | `123` | `123456` | Autorizado tras 3DS ✅ |
+| Visa 3DS | `4716 0000 0000 0003` | 12/26 | `123` | `123456` | Autorizado tras 3DS ✅ |
+
+> El OTP (contraseña de un solo uso) que pide el simulador 3DS es siempre `123456` en el entorno test.
+
+### Tarjetas que deniegan el pago
+
+| Tipo | Número de tarjeta | Caducidad | CVV | Motivo |
+|------|-------------------|-----------|-----|--------|
+| Visa denegada | `4012 0010 3714 1112` | 12/26 | `123` | Denegado genérico ❌ |
+| Mastercard sin fondos | `5100 0600 0000 1770` | 12/26 | `737` | Fondos insuficientes ❌ |
+
+### Datos del titular (cualquier valor funciona en sandbox)
+
+```
+Nombre titular : TEST USER
+DNI/NIF        : (dejar en blanco o cualquier valor)
+```
+
+### Notas importantes
+
+- **Importe mínimo de prueba:** 1 céntimo (1 en `Ds_Merchant_Amount`, que representa 0,01 €).
+- **Formato de importe REDSYS:** sin decimales, en céntimos. 500 = 5,00 €.
+- **IPN en localhost:** REDSYS sandbox no alcanza `localhost`. Usar [ngrok](https://ngrok.com/) para exponer el endpoint `/api/payments/notify` o simular la notificación manualmente:
+
+```bash
+# Simular notificación IPN REDSYS (ajustar parámetros con los valores reales del pago)
+curl -X POST http://localhost:3000/api/payments/notify \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "Ds_MerchantParameters=BASE64_ENCODED_PARAMS&Ds_Signature=BASE64_SIGNATURE&Ds_SignatureVersion=HMAC_SHA256_V1"
+```
+
+- **Referencia oficial:** [REDSYS — Manual de integración TPV Virtual (test)](https://pagosonline.redsys.es/desarrolladores.html)
