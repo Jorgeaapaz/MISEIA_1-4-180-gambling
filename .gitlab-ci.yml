@@ -42,7 +42,8 @@ deploy:
   before_script:
     - apk add --no-cache openssh-client rsync bash
     - eval $(ssh-agent -s)
-    - echo "$VM_SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - chmod 600 "$VM_SSH_PRIVATE_KEY"
+    - ssh-add "$VM_SSH_PRIVATE_KEY"
     - mkdir -p ~/.ssh
     - ssh-keyscan -H 34.174.56.186 >> ~/.ssh/known_hosts
   script:
