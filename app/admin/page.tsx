@@ -40,13 +40,6 @@ export default function AdminDashboard() {
   const [reports, setReports] = useState<Reports | null>(null)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!user) { router.push('/login'); return }
-    if (user.role !== 'admin') { router.push('/'); return }
-    loadReports()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user])
-
   async function loadReports() {
     try {
       const res = await fetch('/api/admin/reports', { headers: authHeader() })
@@ -55,6 +48,13 @@ export default function AdminDashboard() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (!user) { router.push('/login'); return }
+    if (user.role !== 'admin') { router.push('/'); return }
+    loadReports()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
 
   if (!user || user.role !== 'admin') return null
 

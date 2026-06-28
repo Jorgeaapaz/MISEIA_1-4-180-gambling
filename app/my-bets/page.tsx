@@ -29,26 +29,21 @@ export default function MyBetsPage() {
   const router = useRouter()
   const [bets, setBets] = useState<BetJSON[]>([])
   const [loading, setLoading] = useState(true)
-  const [balance, setBalance] = useState<number | null>(null)
+
+  async function loadData() {
+    try {
+      const res = await fetch('/api/bets', { headers: authHeader() })
+      if (res.ok) setBets(await res.json())
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     if (!user) { router.push('/login'); return }
     loadData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
-
-  async function loadData() {
-    try {
-      const [betsRes, profileRes] = await Promise.all([
-        fetch('/api/bets', { headers: authHeader() }),
-        fetch('/api/admin/users', { headers: authHeader() }),
-      ])
-      if (betsRes.ok) setBets(await betsRes.json())
-      // Get own balance from admin/users if admin, otherwise from session
-    } finally {
-      setLoading(false)
-    }
-  }
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto', padding: '2rem 1rem' }}>

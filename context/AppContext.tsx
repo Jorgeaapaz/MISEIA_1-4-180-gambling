@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, ReactNode } from 'react'
 import { SessionPayload } from '@/lib/types'
 
 interface AppContextType {
@@ -14,17 +14,15 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | null>(null)
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<SessionPayload | null>(null)
-  const [token, setToken] = useState<string | null>(null)
-
-  useEffect(() => {
-    const storedToken = localStorage.getItem('session_token')
-    const storedUser = localStorage.getItem('session_user')
-    if (storedToken && storedUser) {
-      setToken(storedToken)
-      setUser(JSON.parse(storedUser))
-    }
-  }, [])
+  const [token, setToken] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null
+    return localStorage.getItem('session_token')
+  })
+  const [user, setUser] = useState<SessionPayload | null>(() => {
+    if (typeof window === 'undefined') return null
+    const stored = localStorage.getItem('session_user')
+    return stored ? (JSON.parse(stored) as SessionPayload) : null
+  })
 
   function login(newToken: string, newUser: SessionPayload) {
     localStorage.setItem('session_token', newToken)

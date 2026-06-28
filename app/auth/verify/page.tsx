@@ -12,18 +12,12 @@ function VerifyContent() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [errorMsg, setErrorMsg] = useState('')
 
-  useEffect(() => {
-    const token = searchParams.get('token')
+  async function verify(token: string | null) {
     if (!token) {
       setErrorMsg('Token no encontrado en la URL')
       setStatus('error')
       return
     }
-    verify(token)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  async function verify(token: string) {
     try {
       const res = await fetch(`/api/auth/verify?token=${encodeURIComponent(token)}`)
       const data = await res.json()
@@ -40,6 +34,12 @@ function VerifyContent() {
       setStatus('error')
     }
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    verify(searchParams.get('token'))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div

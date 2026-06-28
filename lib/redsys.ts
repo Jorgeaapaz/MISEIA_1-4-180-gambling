@@ -8,7 +8,8 @@ const NOTIFICATION_URL = process.env.REDSYS_NOTIFICATION_URL!
 const OK_URL = process.env.REDSYS_OK_URL!
 const KO_URL = process.env.REDSYS_KO_URL!
 
-function base64url(input: Buffer | string): string {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function _base64url(input: Buffer | string): string {
   const b = Buffer.isBuffer(input) ? input : Buffer.from(input)
   return b.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
 }

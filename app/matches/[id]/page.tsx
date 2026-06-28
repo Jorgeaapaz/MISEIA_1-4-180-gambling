@@ -46,15 +46,6 @@ export default function MatchDetailPage() {
     Ds_Signature: string
   } | null>(null)
 
-  useEffect(() => {
-    if (!user) {
-      router.push('/login')
-      return
-    }
-    loadMatch()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, id])
-
   async function loadMatch() {
     try {
       const res = await fetch(`/api/matches?status=open`, { headers: authHeader() })
@@ -79,6 +70,15 @@ export default function MatchDetailPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login')
+      return
+    }
+    loadMatch()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, id])
 
   async function handleBet(e: React.FormEvent) {
     e.preventDefault()

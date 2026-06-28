@@ -15,13 +15,6 @@ export default function AdminMatchDetailPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
-  useEffect(() => {
-    if (!user) { router.push('/login'); return }
-    if (user.role !== 'admin') { router.push('/'); return }
-    loadMatch()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, id])
-
   async function loadMatch() {
     for (const s of ['closed', 'open', 'settled']) {
       const res = await fetch(`/api/matches?status=${s}`, { headers: authHeader() })
@@ -32,6 +25,14 @@ export default function AdminMatchDetailPage() {
       }
     }
   }
+
+  useEffect(() => {
+    if (!user) { router.push('/login'); return }
+    if (user.role !== 'admin') { router.push('/'); return }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadMatch()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, id])
 
   async function handleSettle(e: React.FormEvent) {
     e.preventDefault()

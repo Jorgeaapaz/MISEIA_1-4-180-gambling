@@ -67,11 +67,6 @@ export default function HomePage() {
     }
   }, [user, router])
 
-  useEffect(() => {
-    if (user) loadMatches()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, filter])
-
   async function loadMatches() {
     setLoading(true)
     try {
@@ -81,6 +76,12 @@ export default function HomePage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (user) loadMatches()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, filter])
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', padding: '2rem 1rem' }}>

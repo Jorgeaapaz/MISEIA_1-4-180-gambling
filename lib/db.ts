@@ -7,9 +7,7 @@ let client: MongoClient
 let db: Db
 
 declare global {
-  // eslint-disable-next-line no-var
   var _mongoClient: MongoClient | undefined
-  // eslint-disable-next-line no-var
   var _mongoDb: Db | undefined
 }
 
