@@ -1,0 +1,8 @@
+process.env.JWT_SECRET = 'test-secret-for-unit-tests-minimum-32-chars!'
+process.env.REDSYS_MERCHANT_CODE = '999008881'
+process.env.REDSYS_TERMINAL = '1'
+process.env.REDSYS_SECRET_KEY = 'sq7HjrUOBfKmC576ILgskD5srU870gJ7'
+process.env.REDSYS_URL = 'https://sis-t.redsys.es:25443/sis/realizarPago'
+process.env.REDSYS_NOTIFICATION_URL = 'http://localhost:3000/api/payments/notify'
+process.env.REDSYS_OK_URL = 'http://localhost:3000/payments/ok'
+process.env.REDSYS_KO_URL = 'http://localhost:3000/payments/ko'

@@ -1,0 +1,19 @@
+services:
+  gambling:
+    build: .
+    container_name: gambling
+    env_file: .env.production
+    restart: unless-stopped
+    networks:
+      - miseia-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gambling.rule=Host(`gambling.deviaaps.com`)"
+      - "traefik.http.routers.gambling.entrypoints=websecure"
+      - "traefik.http.routers.gambling.tls=true"
+      - "traefik.http.routers.gambling.tls.certresolver=cloudflare"
+      - "traefik.http.services.gambling-svc.loadbalancer.server.port=3000"
+
+networks:
+  miseia-net:
+    external: true

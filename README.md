@@ -144,24 +144,12 @@ npm install
 
 ### Environment Variables
 
-Create `.env.local` in the project root:
-
-```env
-MONGODB_URI=mongodb://localhost:27017
-MONGODB_DB=gambling
-JWT_SECRET=magik-link-dev-secret-2026
-MAILHOG_HOST=localhost
-MAIL_PORT=1027
-MAIL_FROM=noreply@gambling.local
-REDSYS_MERCHANT_CODE=999008881
-REDSYS_TERMINAL=1
-REDSYS_SECRET_KEY=sq7HjrUOBfKmC576ILgskD5srU870gJ7
-REDSYS_URL=https://sis-t.redsys.es:25443/sis/realizarPago
-REDSYS_NOTIFICATION_URL=http://localhost:3000/api/payments/notify
-REDSYS_OK_URL=http://localhost:3000/payments/ok
-REDSYS_KO_URL=http://localhost:3000/payments/ko
-NEXT_PUBLIC_API_URL=http://localhost:3000
+```bash
+cp .env.example .env.local
+# Edit .env.local and fill in your values
 ```
+
+See `.env.example` for the full list of required variables with descriptions.
 
 ### Seed the Database
 
@@ -241,5 +229,70 @@ GET  /api/auth/verify?token=<jwt>
 | Auth | JWT (jsonwebtoken) + Magic Links |
 | Email | Nodemailer + Mailhog |
 | Payments | REDSYS TPV Virtual (test) |
-| Testing | Playwright |
+| Testing | Playwright (E2E) + Vitest (unit) |
 | Language | TypeScript 5 |
+
+---
+
+## Testing
+
+### Unit Tests (Vitest)
+
+Covers `lib/payout.ts`, `lib/auth.ts`, `lib/redsys.ts` — runs offline, no DB or network required.
+
+```bash
+npm run test:unit
+```
+
+Coverage report is generated in `coverage/`. Target: >60% statement coverage on `lib/`.
+
+### E2E Tests (Playwright)
+
+```bash
+npm run test:e2e
+```
+
+Playwright auto-starts `npm run dev` and runs all specs in `tests/e2e/`.
+
+---
+
+## Architecture
+
+See [docs/architecture.md](docs/architecture.md) for system diagrams including:
+- Component and layer diagram
+- Authentication sequence (magic link flow)
+- Bet & payment flow (REDSYS IPN)
+- Match lifecycle state machine
+- Payout algorithm flowchart
+
+### Architecture Decision Records
+
+- [ADR-001: MongoDB Singleton Client](docs/decisions/ADR-001-mongodb-singleton.md)
+- [ADR-002: JWT in localStorage (no cookies)](docs/decisions/ADR-002-jwt-localstorage-no-cookies.md)
+- [ADR-003: Proportional Payout vs Fixed Odds](docs/decisions/ADR-003-proportional-payout.md)
+
+---
+
+## Production Deploy
+
+**Live URL:** https://gambling.deviaaps.com
+
+The app is deployed to a Google Cloud VM running Docker + Traefik v3.3 with a wildcard TLS certificate for `*.deviaaps.com`.
+
+### Deploy Manually
+
+```bash
+# Build the Docker image
+docker compose -f docker-compose.gambling.yml build
+
+# Copy env file and start (on the remote VM)
+scp -i C:\ubuntuiso\.ssh\vboxuser docs/compliance/env.production gcvmuser@34.174.56.186:~/MISEIA1-4-180-gambling/.env.production
+ssh -i C:\ubuntuiso\.ssh\vboxuser gcvmuser@34.174.56.186
+cd ~/MISEIA1-4-180-gambling
+docker compose -f docker-compose.gambling.yml up -d --build
+```
+
+### CI/CD
+
+- **GitHub Actions** (`.github/workflows/ci-cd.yml`): lint → unit tests → build → deploy on push to `master`
+- **GitLab CI** (`.gitlab-ci.yml`): lint → unit tests → build → deploy on push to `master`
